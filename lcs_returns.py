@@ -1,4 +1,5 @@
-# LCS Return
+# LCS Return https://www.hackerrank.com/challenges/tutzki-and-lcs/problem
+# python -m cProfile lcs_returns.py
 
 # Given two strings,  and, find and print the total number of ways to insert a character at any position in string such that the length of the Longest Common Subsequence of characters in the two strings increases by one.
 
@@ -49,13 +50,17 @@ def lcs(X, Y):
 
 
 def tutzkiAndLcs(a, b):
+    mem = dict()
     n = []
     # current lcs
-    lcs = mylcs(a, b)
+    # lcs = mylcs(a, b, mem)
+    lcs = lcs_recursive(a, b, len(a), len(b))
     len_a = len(a)
+    len_a_range = list(range(len_a + 1))
     for c in set(b):
-        for i in range(len_a + 1):
-            x = mylcs(a[:i] + c + a[i:], b)
+        for i in len_a_range:
+            # x = mylcs(a[:i] + c + a[i:], b, mem)
+            x = lcs_recursive(a[:i] + c + a[i:], b, len(a[:i] + c + a[i:]), len(b))
             if x > lcs:
                 # print(c, i, x, a[:i] + c + a[i:])
                 # store way into list
@@ -64,11 +69,15 @@ def tutzkiAndLcs(a, b):
     # return total number of way
     return len(n)
 
-def mylcs(b, a):
+def mylcs(b, a, mem):
+    key = "%s%s" % (b, a)
+    if key in mem.keys():
+        return mem[key]
+
     len_a = len(a)
     len_b = len(b)
     c = [[0] * (len_b + 1) for i in range(len_a + 1)]
-    j_range = range(1, len_b + 1)
+    j_range = list(range(1, len_b + 1))
     for i in range(1, len_a + 1):
         for j in j_range:
             # if i == 0 or j == 0:
@@ -78,8 +87,18 @@ def mylcs(b, a):
             else:
                 # c[i][j] = max(c[i-1][j], c[i][j-1])
                 c[i][j] = c[i-1][j] if c[i-1][j] > c[i][j-1] else c[i][j-1]
+    mem[key] = c[len_a][len_b]
     return c[len_a][len_b]
 
+def lcs_recursive(X, Y, m, n): 
+  
+    if m == 0 or n == 0: 
+       return 0
+    elif X[m-1] == Y[n-1]: 
+       return 1 + lcs_recursive(X, Y, m-1, n-1)
+    else: 
+       return max(lcs_recursive(X, Y, m, n-1), lcs_recursive(X, Y, m-1, n))
+  
 
 if __name__ == "__main__":
     a = "AGGTAB"
